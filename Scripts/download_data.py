@@ -20,6 +20,12 @@ def download_all_zips():
 
     for link in links:
         filename = link.split('/')[-1]
+        
+        # Omitir archivos que contienen "JC" en el nombre
+        if "JC" in filename:
+            print(f"🚫 {filename} omitido por contener 'JC' en el nombre.")
+            continue
+
         path = os.path.join(DEST_FOLDER, filename)
         
         if not os.path.exists(path):
