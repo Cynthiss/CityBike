@@ -1,11 +1,41 @@
 import os
 import pandas as pd
+#from azure.storage.blob import BlobServiceClient
 
 BRONZE_FOLDER = "data/bronze/"
 SILVER_FOLDER = "data/silver/"
 CHUNKSIZE = 500_000
 
+# Crear la carpeta de Silver si no existe
 os.makedirs(SILVER_FOLDER, exist_ok=True)
+
+# Definir mapeo flexible de columnas a nombres estándar
+COLUMN_MAPPING = {
+    'start_time': ['starttime', 'start_time', 'started_at', 'start time'],
+    'end_time': ['stoptime', 'end_time', 'ended_at', 'stop time'],
+    'trip_duration': ['tripduration', 'trip_duration', 'trip duration'],
+    'start_station_name': ['start_station_name', 'start station name'],
+    'end_station_name': ['end_station_name', 'end station name'],
+    'member_type': ['member_casual', 'usertype', 'user_type'],
+}
+
+STANDARD_COLUMNS = list(COLUMN_MAPPING.keys())
+
+def normalize_columns(df):
+    col_map = {}
+    for standard_col, possible_names in COLUMN_MAPPING.items():
+        for col in df.columns:
+            if col.lower().strip().replace(" ", "_") in [name.lower().strip().replace(" ", "_") for name in possible_names]:
+                col_map[col] = standard_col
+                break
+    df.rename(columns=col_map, inplace=True)
+
+    # Asegurar todas las columnas estándar existen
+    for col in STANDARD_COLUMNS:
+        if col not in df.columns:
+            df[col] = pd.NA
+
+    return df[STANDARD_COLUMNS]  # Reordenar
 
 def transform_to_silver():
     bronze_files = [f for f in os.listdir(BRONZE_FOLDER) if f.endswith(".parquet")]
@@ -17,15 +47,10 @@ def transform_to_silver():
             df = pd.read_parquet(os.path.join(BRONZE_FOLDER, file))
 
             # Convertir en datetime
-            for col in ["star_time", "end_time", "started_at", "ended_at"]:
+            for col in ["start_time", "end_time"]:
                 if col in df.columns: 
-                    df[col] = pd.to_datetime(df[col], errors = "coerce")
+                    df[col] = pd.to_datetime(df[col], errors="coerce")
             
-            if 'started_at' in df.columns and 'start_time' not in df.columns:
-                df['start_time'] = df['started_at']
-            if 'ended_at' in df.columns and 'end_time' not in df.columns:
-                df['end_time'] = df['ended_at']
-
             # Calcular trip_duration si no existe
             if 'trip_duration' not in df.columns or df['trip_duration'].isnull().all():
                 df['trip_duration'] = (df['end_time'] - df['start_time']).dt.total_seconds() / 60
@@ -47,8 +72,13 @@ def transform_to_silver():
                     'customer': 'casual'
                 })
 
-            # Guardar archivo transformado
+            # Verificar si el archivo ya existe en Silver
             out_path = os.path.join(SILVER_FOLDER, file)
+            if os.path.exists(out_path):
+                print(f"⏩ El archivo {file} ya existe en Silver. Saltando procesamiento.")
+                continue  # Si el archivo ya existe, saltar este archivo
+
+            # Guardar archivo transformado
             df.to_parquet(out_path, index=False)
             print(f"✅ Guardado en Silver: {file}")
 

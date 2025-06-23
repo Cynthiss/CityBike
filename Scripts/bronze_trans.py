@@ -1,13 +1,12 @@
 import os
-import pandas as pd
+import pandas as pd 
 from multiprocessing import Pool
 
 RAW_FOLDER = "data/raw/"
 BRONZE_FOLDER = "data/bronze/"
 CHUNKSIZE = 500_000
-YEAR = 2023
+YEAR = 2019
   # Procesar solo los archivos de 2013
-
 
 # Crear la carpeta de Bronze si no existe
 os.makedirs(BRONZE_FOLDER, exist_ok=True)
