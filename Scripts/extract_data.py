@@ -5,31 +5,33 @@ import glob
 RAW_FOLDER = "data/raw/"
 
 def extract_all_zips():
-    zip_files = [f for f in os.listdir(RAW_FOLDER) if f.endswith(".zip")]
+    # Usar os.walk() para recorrer subcarpetas también
+    zip_files = []
+    for root, _, files in os.walk(RAW_FOLDER):
+        zip_files.extend([os.path.join(root, file) for file in files if file.endswith(".zip")])
 
     print(f"🔍 Archivos ZIP encontrados: {len(zip_files)}")
 
-    for file in zip_files:
-        zip_path = os.path.join(RAW_FOLDER, file)
-
+    for zip_path in zip_files:
         try:
-            # Nombre base del CSV esperado (puede variar si el ZIP tiene otro nombre dentro)
-            expected_name = file.replace(".zip", "").lower()
+            # Obtener el nombre base del archivo
+            file_name = os.path.basename(zip_path)
+            expected_name = file_name.replace(".zip", "").lower()
 
             # Buscar si ya hay un CSV con ese nombre base
             matching_files = glob.glob(os.path.join(RAW_FOLDER, f"{expected_name}*.csv"))
 
             if matching_files:
-                print(f"⏭️ Ya extraído (o duplicado): {file}")
+                print(f"⏭️ Ya extraído (o duplicado): {file_name}")
                 continue
 
             # Extraer ZIP completo
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall(RAW_FOLDER)
-                print(f"✅ Extraído: {file}")
+                print(f"✅ Extraído: {file_name}")
 
         except zipfile.BadZipFile:
-            print(f"⚠️ Archivo corrupto o inválido: {file}")
+            print(f"⚠️ Archivo corrupto o inválido: {file_name}")
 
     # Eliminar archivos duplicados
     cleanup_duplicates()
@@ -50,3 +52,4 @@ def cleanup_duplicates():
 
 if __name__ == "__main__":
     extract_all_zips()
+
