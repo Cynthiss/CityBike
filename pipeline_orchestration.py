@@ -17,7 +17,7 @@ def extract_data():
 @task
 def bronze_conversion():
     print("🔁 Convirtiendo a Bronze...")
-    subprocess.run(["python", "Scripts/bronze_converter.py"])
+    subprocess.run(["python", "Scripts/bronze_trans.py"])
 
 # Tarea 4: Limpiar y transformar los datos para la capa Silver
 @task
@@ -29,7 +29,7 @@ def silver_transformation():
 @task
 def gold_aggregations():
     print("📊 Generando capa Gold...")
-    subprocess.run(["python", "Scripts/gold_aggregations.py"])
+    subprocess.run(["python", "Scripts/gold_transform.py"])
 
 # Tarea 6: Exportar los Parquet Gold a CSV para visualización
 #@task
