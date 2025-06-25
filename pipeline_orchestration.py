@@ -17,7 +17,7 @@ def extract_data():
 @task
 def bronze_conversion():
     print("🔁 Convirtiendo a Bronze...")
-    subprocess.run(["python", "Scripts/bronze_converter.py"])
+    subprocess.run(["python", "Scripts/bronze_trans.py"])
 
 # Tarea 4: Limpiar y transformar los datos para la capa Silver
 @task
@@ -29,13 +29,7 @@ def silver_transformation():
 @task
 def gold_aggregations():
     print("📊 Generando capa Gold...")
-    subprocess.run(["python", "Scripts/gold_aggregations.py"])
-
-# Tarea 6: Exportar los Parquet Gold a CSV para visualización
-#@task
-#def export_to_csv():
-    #print("📝 Exportando Gold a CSV...")
-    #subprocess.run(["python", "Scripts/export_gold_to_csv.py"])
+    subprocess.run(["python", "Scripts/gold_transform.py"])
 
 # Flujo principal que define el orden de las tareas
 @flow(name="citybike_etl_pipeline")
@@ -45,7 +39,6 @@ def citybike_etl():
     bronze_conversion()
     silver_transformation()
     gold_aggregations()
-    #export_to_csv()
 
 # Punto de entrada para ejecutar el flujo desde consola
 if __name__ == "__main__":
