@@ -7,7 +7,7 @@ connection_string = "DefaultEndpointsProtocol=https;AccountName=datacitybikes;Ac
 blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
 # Seleccionar el contenedor
-container_name = "data-cbike"  # Tu contenedor
+container_name = "gold"  # Tu contenedor
 container_client = blob_service_client.get_container_client(container_name)
 
 # Listar los blobs (archivos) en el contenedor

@@ -32,37 +32,50 @@
 
 # ------------------------------------------
 # SUBIR DIRECTORIO COMPLETO
-
+from azure.storage.blob import BlobServiceClient
 import os
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-# Cadena de conexión de tu cuenta de Azure Storage
-connection_string = "DefaultEndpointsProtocol=https;AccountName=datacitybikes;AccountKey=sOzQFreiy/HgrkS0Eu3m3+YfP2x7bvu8syWnKedSHtRfIOjG8r/mxFwo5mfwlvrfuDKjIrXOq98h+AStulbRng==;EndpointSuffix=core.windows.net"
-container_name = "data-cbike"  # Nombre del contenedor en Azure
+# Conexión
+connection_string = "DefaultEndpointsProtocol=https;AccountName=datacitybikes;AccountKey=xxxxxxxxxxxxxxxx;EndpointSuffix=core.windows.net"
 
-def upload_directory(local_directory_path, container_name):
-    # Crear el cliente de BlobServiceClient
+# Lista de contenedores (capas)
+containers = ["raw", "bronze", "silver", "gold"]
+
+# Ruta base local
+base_local_path = r"C:\Users\Santos\Documents\GitHub\CityBike\Data"
+
+def upload_to_container(container_name):
+    local_directory = os.path.join(base_local_path, container_name)
+    if not os.path.exists(local_directory):
+        print(f"No existe carpeta local para '{container_name}'.")
+        return
+
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     container_client = blob_service_client.get_container_client(container_name)
 
-    # Recorrer todos los archivos en el directorio y subcarpetas
-    for root, dirs, files in os.walk(local_directory_path):
+    # Crea contenedor si no existe
+    try:
+        container_client.create_container()
+        print(f"Contenedor '{container_name}' creado.")
+    except Exception:
+        print(f"ℹContenedor '{container_name}' ya existe.")
+
+    # Upload
+    for root, dirs, files in os.walk(local_directory):
         for file in files:
-            # Crear la ruta del archivo completo
-            local_file_path = os.path.join(root, file)
-            
-            # Convertir la ruta local a la ruta del blob
-            relative_path = os.path.relpath(local_file_path, local_directory_path)
-            blob_path = os.path.join("data", relative_path).replace("\\", "/")  # Para la estructura de carpetas en Azure
+            local_path = os.path.join(root, file)
+            relative_path = os.path.relpath(local_path, local_directory)
+            blob_path = relative_path.replace("\\", "/")
 
-            # Subir el archivo al contenedor
             blob_client = container_client.get_blob_client(blob_path)
-            with open(local_file_path, "rb") as data:
+            with open(local_path, "rb") as data:
                 blob_client.upload_blob(data, overwrite=True)
-            print(f"Archivo subido: {blob_path}")
 
-# Ruta local de la carpeta PARA SUBIR 
-local_directory_path = r"C:\Users\Santos\Documents\GitHub\CityBike\Data\gold_p"  # Reemplaza con la ruta de tu directorio
-upload_directory(local_directory_path, container_name)
+            print(f"✔️ Subido: {blob_path}")
 
-#Subir directorio completo
+def main():
+    for container in containers:
+        upload_to_container(container)
+
+if __name__ == "__main__":
+    main()
