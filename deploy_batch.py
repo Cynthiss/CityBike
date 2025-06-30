@@ -1,16 +1,12 @@
-from prefect.deployments import Deployment
-from prefect.server.schemas.schedules import CronSchedule
-from pipeline_orchestration import citybike_etl
+from pipeline_orchestration import citybike_etl_pipeline
 
-deployment = Deployment.build_from_flow(
-    flow=citybike_etl,
-    name="weekly-batch",
-    schedule=CronSchedule(cron="0 2 * * 1"),  # Todos los lunes a las 2am
-    work_queue_name="default"
-)
-
-deployment.apply()
-
+if __name__ == "__main__":
+    citybike_etl_pipeline.deploy(
+        name = "weekly-batch", 
+        work_queue_name = "default", 
+        schedule = "0.2 * * 1",
+        tags = ["batch", "citybikes"]
+    )
 
 # CORRER UNA VEZ DESDE TERMINAL
 # COMANDO - python deploy_batch.py
