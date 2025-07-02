@@ -28,11 +28,16 @@ def gold_aggregations():
     subprocess.run(["python", "Scripts/gold_trans.py"])
 
 @task
+def gold_aggregations():
+    subprocess.run(["python", "Scripts/consolidate_g.py"])
+
+@task
 def upload_to_blob():
-    subprocess.run(["python", "Connection/up_data.py"])
+    subprocess.run(["python", "Conection/Up_data.py"])
 
 '''
 @task
+
 def validate_data():
     subprocess.run(["python", "Validation/data_quality.py"])
 '''

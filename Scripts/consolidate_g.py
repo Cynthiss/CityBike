@@ -3,7 +3,7 @@ import pandas as pd
 
 # Configuración de carpetas
 GOLD_FOLDER = "Data/gold/"
-CONSOLIDATED_FOLDER = "Data/consolidated/"
+CONSOLIDATED_FOLDER = "Data/goldc/"
 os.makedirs(CONSOLIDATED_FOLDER, exist_ok=True)
 
 # Definir los tipos que solo se concatenan (no agrupar)
