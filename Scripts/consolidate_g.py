@@ -39,9 +39,9 @@ def consolidate_files(data_type):
         if data_type == 'daily':
             keys = ['date']
         elif data_type == 'monthly':
-            keys = ['year_month']
+            keys = ['year_month', 'start_hour']
         elif data_type == 'hourly':
-            keys = ['year_month']
+            keys = ['year_month', 'hour']
         elif data_type == 'yearly':
             keys = ['year']
         else:
