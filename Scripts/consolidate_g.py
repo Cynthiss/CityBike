@@ -7,7 +7,7 @@ CONSOLIDATED_FOLDER = "Data/goldc/"
 os.makedirs(CONSOLIDATED_FOLDER, exist_ok=True)
 
 # Tipos que solo se concatenan
-CONCATENATE_ONLY = ['station', 'member_type']
+CONCATENATE_ONLY = ['station', 'member_type', 'station_coordinates']
 
 # Función de consolidación
 def consolidate_files(data_type):
@@ -40,7 +40,8 @@ def consolidate_files(data_type):
             'daily': ['date'],
             'monthly': ['year_month'],
             'hourly': ['year_month', 'start_hour'],
-            'yearly': ['year']
+            'yearly': ['year'],
+            'rides_by_birth_year': ['birthday_year', 'year_month']
         }
 
         keys = keys_dict.get(data_type)
@@ -58,7 +59,10 @@ def consolidate_files(data_type):
     print(f"✅ Guardado: {output_path}")
 
 def consolidate_all():
-    data_types = ['daily', 'monthly', 'station', 'member_type', 'hourly', 'yearly']
+    data_types = [
+        'daily', 'monthly', 'station', 'member_type',
+        'hourly', 'yearly', 'station_coordinates', 'rides_by_birth_year'
+    ]
     for data_type in data_types:
         consolidate_files(data_type)
     print("\n🏁 Consolidación completada.")
