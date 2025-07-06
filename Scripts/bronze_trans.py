@@ -6,9 +6,8 @@ RAW_FOLDER = "data/raw/"
 BRONZE_FOLDER = "data/bronze/"
 CHUNKSIZE = 500_000
 YEAR = 2019
-  # Procesar solo los archivos de 2013
 
-# Crear la carpeta de Bronze si no existe
+# Create bronze 
 os.makedirs(BRONZE_FOLDER, exist_ok=True)
 
 # Definir mapeo flexible de columnas a nombres estándar

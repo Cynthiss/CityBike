@@ -65,6 +65,23 @@ def generate_aggregations(file_path):
         avg_trip_duration=('trip_duration', 'mean')
     ).reset_index()
 
+    # 7. Coordenadas únicas
+    stations_start = df[['start_station_name', 'start_lat', 'start_lng']].dropna().drop_duplicates()
+    stations_start.columns = ['station_name', 'lat', 'lng']
+
+    stations_end = df[['end_station_name', 'end_lat', 'end_lng']].dropna().drop_duplicates()
+    stations_end.columns = ['station_name', 'lat', 'lng']
+
+    station_coords = pd.concat([stations_start, stations_end], ignore_index=True).drop_duplicates(subset='station_name')
+
+    # 8. Rides por birth_year
+    rides_birth_year = pd.DataFrame()
+    if 'birth_year' in df.columns:
+        df['birth_year'] = pd.to_numeric(df['birth_year'], errors='coerce')
+        rides_birth_year = df.dropna(subset=['birth_year', 'year_month']) \
+            .groupby(['birth_year', 'year_month']) \
+            .size().reset_index(name='num_rides')
+
     # Guardar resultados
     save_to_gold(daily_data, 'daily', file_path)
     save_to_gold(monthly_data, 'monthly', file_path)
@@ -72,6 +89,10 @@ def generate_aggregations(file_path):
     save_to_gold(member_type_data, 'member_type', file_path)
     save_to_gold(hourly_data, 'hourly', file_path)
     save_to_gold(yearly_data, 'yearly', file_path)
+    save_to_gold(station_coords, 'station_coordinates', file_path)
+    
+    if not rides_birth_year.empty:
+        save_to_gold(rides_birth_year, 'rides_by_birth_year', file_path)
 
 # Guardar cada agregación en carpeta Gold
 def save_to_gold(df, data_type, file_path):

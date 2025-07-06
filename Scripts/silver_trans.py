@@ -21,6 +21,9 @@ COLUMN_MAPPING = {
 
 STANDARD_COLUMNS = list(COLUMN_MAPPING.keys())
 
+OPTIONAL_COLUMNS = ['start_lat', 'start_lng', 'end_lat', 'end_lng', 'birth_year']
+
+
 def normalize_columns(df):
     col_map = {}
     for standard_col, possible_names in COLUMN_MAPPING.items():
@@ -71,6 +74,10 @@ def transform_to_silver():
                     'subscriber': 'member',
                     'customer': 'casual'
                 })
+            
+            for col in OPTIONAL_COLUMNS:
+                if col not in df.columns:
+                    df[col] = pd.NA
 
             # Verificar si el archivo ya existe en Silver
             out_path = os.path.join(SILVER_FOLDER, file)
