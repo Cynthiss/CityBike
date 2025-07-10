@@ -18,6 +18,10 @@ COLUMN_MAPPING = {
     'start_station_name': ['start_station_name', 'start station name'],
     'end_station_name': ['end_station_name', 'end station name'],
     'member_type': ['member_casual', 'usertype', 'user_type'],
+    'start_lat': ['start_lat', 'start latitude', 'start_station_latitude', 'start station latitude'],
+    'start_lng': ['start_lng', 'start longitude', 'start_station_longitude', 'start station longitude'],
+    'end_lat': ['end_lat', 'end latitude', 'end_station_latitude', 'end station latitude'],
+    'end_lng': ['end_lng', 'end longitude', 'end_station_longitude', 'end station longitude']
 }
 
 STANDARD_COLUMNS = list(COLUMN_MAPPING.keys())

@@ -11,12 +11,14 @@ def process_bronze_file(file_path):
         df = pd.read_parquet(file_path)
 
         # Verificación de columnas necesarias
-        required_columns = ['start_time', 'end_time', 'trip_duration', 'start_station_name', 'end_station_name', 'member_type']
+        required_columns = ['start_time', 'end_time', 'trip_duration', 'start_station_name', 'end_station_name', 'member_type', 'start_lat', 'start_lng', 'end_lat', 'end_lng']
         for col in required_columns:
             if col not in df.columns:
                 print(f"❌ Columna '{col}' no encontrada en el archivo: {file_path}")
                 return  # Si alguna columna falta, no procesamos el archivo
-        
+
+        df = df[required_columns]  # Filtrar solo las columnas necesarias
+                
         # Limpiar columnas numéricas (como trip_duration)
         df['trip_duration'] = pd.to_numeric(df['trip_duration'], errors='coerce')  # Convertir valores no numéricos a NaN
         
@@ -30,7 +32,7 @@ def process_bronze_file(file_path):
         df['end_time'] = pd.to_datetime(df['end_time'], errors='coerce')
 
         # Eliminar filas con fechas nulas (esto puede variar según el contexto)
-        df.dropna(subset=['start_time', 'end_time'], inplace=True)
+        # df.dropna(subset=['start_time', 'end_time'], inplace=True)
 
         # Guardar el archivo procesado
         output_path = os.path.join(SILVER_FOLDER, os.path.basename(file_path))
